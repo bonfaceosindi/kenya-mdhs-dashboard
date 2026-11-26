@@ -174,8 +174,9 @@ docker run -d --name kmdhs -p 4949:4949 kmdhs-dashboard
 
 ### Rebuilding the data from the PDF
 
-The report PDF is not stored in this repository. Download it from the DHS Program or KNBS
-(DOI: [10.63814/k7m3xq21](https://doi.org/10.63814/k7m3xq21)) and save it as
+The report PDF is not stored in this repository. Download the *2025–26 Kenya Mini DHS Final Report*
+from [The DHS Program](https://dhsprogram.com) (search for Kenya) or the
+[Kenya National Bureau of Statistics](https://www.knbs.or.ke), and save it as
 `KMDHS_2025-26_Final_Report/KMDHS_2025-26_Final_Report.pdf`. Then, from the project root:
 
 ```bash
@@ -211,7 +212,11 @@ in the browser through WebAssembly (webR), and publishes the result to GitHub Pa
 ## Source and licence
 
 **Data source:** KNBS and ICF. 2026. *2025–26 Kenya Mini Demographic and Health Survey.* Nairobi, Kenya,
-and Rockville, Maryland, USA: KNBS and ICF. DOI: 10.63814/k7m3xq21.
+and Rockville, Maryland, USA: KNBS and ICF. ISBN 978-9914-9428-7-3. Available from
+[dhsprogram.com](https://dhsprogram.com) and [knbs.or.ke](https://www.knbs.or.ke).
+
+The report also prints the DOI 10.63814/k7m3xq21, which did not yet resolve at doi.org as of
+November 2026.
 
 The report is published under **CC BY-NC 4.0**. This dashboard is a non-commercial derivative. It is
 not an official product of KNBS, the Ministry of Health or ICF, and its values come from the

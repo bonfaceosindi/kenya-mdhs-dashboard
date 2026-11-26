@@ -215,7 +215,16 @@ page_navbar(
       tags$link(rel = "preconnect", href = "https://fonts.googleapis.com"),
       tags$link(rel = "stylesheet",
                 href = "https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"),
-      tags$style(HTML(app_css))
+      tags$style(HTML(app_css)),
+      # Links to other sites open in a new tab, so the dashboard stays open
+      # (inside Shinylive the app runs in a frame, where a plain link would replace it)
+      tags$script(HTML("
+        document.addEventListener('click', function (e) {
+          var a = e.target.closest && e.target.closest('a[href]');
+          if (a && /^https?:/i.test(a.href) && a.host !== location.host) {
+            a.target = '_blank'; a.rel = 'noopener noreferrer';
+          }
+        }, true);"))
     ),
     div(class = "flag-stripe")
   ),

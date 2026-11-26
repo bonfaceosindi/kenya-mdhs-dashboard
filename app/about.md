@@ -54,7 +54,9 @@ County boundaries come from geoBoundaries (gbOpen, KEN ADM1, CC BY 4.0).
 ### Source and licence
 
 KNBS and ICF. 2026. *2025–26 Kenya Mini Demographic and Health Survey.* Nairobi, Kenya,
-and Rockville, Maryland, USA: KNBS and ICF. DOI: 10.63814/k7m3xq21.
+and Rockville, Maryland, USA: KNBS and ICF. ISBN 978-9914-9428-7-3. The full report is
+available from [The DHS Program](https://dhsprogram.com) and the
+[Kenya National Bureau of Statistics](https://www.knbs.or.ke).
 
 The report is published under the Creative Commons Attribution-NonCommercial 4.0
 licence (CC BY-NC 4.0). This dashboard is a non-commercial derivative and is not an
