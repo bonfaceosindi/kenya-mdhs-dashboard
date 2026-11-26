@@ -1,0 +1,36 @@
+date,table_id,page,panel,category,indicator,extracted,pdf,match
+2026-11-25,7.4.2C,152,,Trans Nzoia,Male condoms,0.6,0.6,TRUE
+2026-11-25,3.9C,76,,Busia,Registration easy,32.4,32.4,TRUE
+2026-11-25,13.2C,348,,Kajiado,Unimproved drinking water,1.0,1.0,TRUE
+2026-11-25,7.4.2C,152,,Migori,Any method,60.5,60.5,TRUE
+2026-11-25,9.7C,211,Live births,Garissa,Delivered in private facility (NGO),1.0,1.0,TRUE
+2026-11-25,13.2C,348,,Kitui,Unimproved drinking water,3.7,3.7,TRUE
+2026-11-25,7.4.2C,152,,Kiambu,Injectables,13.0,13.0,TRUE
+2026-11-25,7.4.2C,152,,Trans Nzoia,Any traditional method,2.4,2.4,TRUE
+2026-11-25,9.1C,198,Live births and stillbirths,Total,ANC from doctor,48.1,48.1,TRUE
+2026-11-25,7.4.2C,152,,Mombasa,Any traditional method,3.2,3.2,TRUE
+2026-11-25,7.4.2C,152,,West Pokot,Male condoms,0.9,0.9,TRUE
+2026-11-25,5.2C,111,,Kitui,Currently pregnant,4.9,4.9,TRUE
+2026-11-25,3.9C,76,,Lamu,Registration very difficult,2.1,2.1,TRUE
+2026-11-25,7.4.2,151,Currently married women,Highest,Female condoms,0.0,0.0,TRUE
+2026-11-25,9.1C,198,Live births,Nyeri,No ANC,0.0,0.0,TRUE
+2026-11-25,2.4C,25,,Kisumu,Clean fuels for space heating,4.0,4.0,TRUE
+2026-11-25,2.4C,25,,Uasin Gishu,Clean fuels for cooking/heating/lighting,23.0,23.0,TRUE
+2026-11-25,9.1C,198,Live births,Nairobi City,ANC from doctor,60.7,60.7,TRUE
+2026-11-25,7.4.2,151,Currently married women,Middle,Any method,63.8,63.8,TRUE
+2026-11-25,3.9C,76,,Wajir,Registered with SHA,28.0,28.0,TRUE
+2026-11-25,5.12C,121,,Samburu,Teen ever had a pregnancy loss,0.6,0.6,TRUE
+2026-11-25,13.9C,360,,Wajir,Menstrual cup,0.0,0.0,TRUE
+2026-11-25,3.12C,82,,Lamu,Accident/injury,0.0,0.0,TRUE
+2026-11-25,9.21.2C,240,,Machakos,Any HPV vaccination,9.0,9.0,TRUE
+2026-11-25,13.9C,360,,Mombasa,Privacy and appropriate materials,97.1,97.1,TRUE
+2026-11-25,12.9C,333,Live births,Makueni,IPTp 3+ doses of SP/Fansidar,1.6,1.6,TRUE
+2026-11-25,9.14C,224,,Embu,No postnatal check for newborn,6.4,(6.4),TRUE
+2026-11-25,14.3C,378,,Wajir,Doxxing,0.0,0.0,TRUE
+2026-11-25,10.1C,258,,Laikipia,Low birth weight (<2.5 kg),12.7,12.7,TRUE
+2026-11-25,4.4C,96,,Embu,Median age at first sex (women 25–49),19.1,19.1,TRUE
+2026-11-25,7.16C,165,,Narok,FP message: mobile phone,29.6,29.6,TRUE
+2026-11-25,3.14C,86,,Meru,Improved personal health,3.6,(3.6),TRUE
+2026-11-25,13.7C,356,,Makueni,Child used toilet or latrine,1.6,1.6,TRUE
+2026-11-25,10.14C,275,,Nakuru,On track developmentally (ECDI2030 24–59 months),87.9,87.9,TRUE
+2026-11-25,9.6C,249,,Bungoma,Protected against neonatal tetanus,79.3,79.3,TRUE

@@ -1,0 +1,15 @@
+# Local tooling and notes
+.claude/
+ANALYSIS_PLAN.md
+
+# OS and R session files
+.DS_Store
+.Rhistory
+.RData
+.Rproj.user/
+
+# Source report PDF (17 MB, published by KNBS and ICF; download via the DOI in the README)
+KMDHS_2025-26_Final_Report/
+
+# Shinylive build output (built by GitHub Actions on each push)
+site/

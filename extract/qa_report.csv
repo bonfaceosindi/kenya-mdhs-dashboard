@@ -1,0 +1,320 @@
+table_id,check,pass,detail
+2.4C,rows found,TRUE,48 rows
+2.4C,47 counties,TRUE,47
+2.4C,unique keys,TRUE,
+3.9C,rows found,TRUE,48 rows
+3.9C,47 counties,TRUE,47
+3.9C,unique keys,TRUE,
+3.9C,distribution sums to 100,TRUE,"48 rows, 5 cols"
+5.2C,rows found,TRUE,48 rows
+5.2C,47 counties,TRUE,47
+5.2C,unique keys,TRUE,
+7.4.2,rows found,TRUE,19 rows
+7.4.2,unique keys,TRUE,
+7.4.2,distribution sums to 100,TRUE,"19 rows, 2 cols"
+7.4.2C,rows found,TRUE,48 rows
+7.4.2C,47 counties,TRUE,47
+7.4.2C,unique keys,TRUE,
+7.4.2C,distribution sums to 100,TRUE,"48 rows, 2 cols"
+8.2,rows found,TRUE,5 rows
+8.2,unique keys,TRUE,
+9.1C,rows found,TRUE,50 rows
+9.1C,47 counties,TRUE,47
+9.1C,unique keys,TRUE,
+9.1C,distribution sums to 100,TRUE,"50 rows, 5 cols"
+9.7C,rows found,TRUE,50 rows
+9.7C,47 counties,TRUE,47
+9.7C,unique keys,TRUE,
+9.7C,distribution sums to 100,TRUE,"50 rows, 6 cols"
+12.3C,rows found,TRUE,48 rows
+12.3C,47 counties,TRUE,47
+12.3C,unique keys,TRUE,
+13.2C,rows found,TRUE,48 rows
+13.2C,47 counties,TRUE,47
+13.2C,unique keys,TRUE,
+13.2C,distribution sums to 100,TRUE,"48 rows, 4 cols"
+10.13C,rows found,TRUE,48 rows
+10.13C,47 counties,TRUE,47
+10.13C,unique keys,TRUE,
+10.14C,rows found,TRUE,48 rows
+10.14C,47 counties,TRUE,47
+10.14C,unique keys,TRUE,
+10.15C,rows found,TRUE,48 rows
+10.15C,47 counties,TRUE,47
+10.15C,unique keys,TRUE,
+10.1C,rows found,TRUE,48 rows
+10.1C,47 counties,TRUE,47
+10.1C,unique keys,TRUE,
+10.1C,distribution sums to 100,TRUE,"48 rows, 4 cols"
+11.11C,rows found,TRUE,48 rows
+11.11C,47 counties,TRUE,47
+11.11C,unique keys,TRUE,
+11.1C,rows found,TRUE,48 rows
+11.1C,47 counties,TRUE,47
+11.1C,unique keys,TRUE,
+12.1C,rows found,TRUE,48 rows
+12.1C,47 counties,TRUE,47
+12.1C,unique keys,TRUE,
+12.2C,rows found,TRUE,50 rows
+12.2C,47 counties,TRUE,47
+12.2C,unique keys,TRUE,
+12.2C,distribution sums to 100,TRUE,"50 rows, 12 cols"
+12.4C,rows found,TRUE,48 rows
+12.4C,47 counties,TRUE,47
+12.4C,unique keys,TRUE,
+12.5C,rows found,TRUE,48 rows
+12.5C,47 counties,TRUE,47
+12.5C,unique keys,TRUE,
+12.6C,rows found,TRUE,48 rows
+12.6C,47 counties,TRUE,47
+12.6C,unique keys,TRUE,
+12.8C,rows found,TRUE,49 rows
+12.8C,47 counties,TRUE,47
+12.8C,unique keys,TRUE,
+12.8C,distribution sums to 100,TRUE,"45 rows, 14 cols"
+12.9C,rows found,TRUE,50 rows
+12.9C,47 counties,TRUE,47
+12.9C,unique keys,TRUE,
+13.4C,rows found,TRUE,48 rows
+13.4C,47 counties,TRUE,47
+13.4C,unique keys,TRUE,
+13.4C,distribution sums to 100,TRUE,"48 rows, 4 cols"
+13.5C,rows found,TRUE,48 rows
+13.5C,47 counties,TRUE,47
+13.5C,unique keys,TRUE,
+13.5C,distribution sums to 100,TRUE,"48 rows, 8 cols"
+13.6C,rows found,TRUE,48 rows
+13.6C,47 counties,TRUE,47
+13.6C,unique keys,TRUE,
+13.6C,distribution sums to 100,TRUE,"48 rows, 7 cols"
+13.7C,rows found,TRUE,48 rows
+13.7C,47 counties,TRUE,47
+13.7C,unique keys,TRUE,
+13.7C,distribution sums to 100,TRUE,"48 rows, 8 cols"
+13.8C,rows found,TRUE,48 rows
+13.8C,47 counties,TRUE,47
+13.8C,unique keys,TRUE,
+13.9C,rows found,TRUE,48 rows
+13.9C,47 counties,TRUE,47
+13.9C,unique keys,TRUE,
+14.10C,rows found,TRUE,48 rows
+14.10C,47 counties,TRUE,47
+14.10C,unique keys,TRUE,
+14.10C,distribution sums to 100,TRUE,"48 rows, 2 cols"
+14.11C,rows found,TRUE,48 rows
+14.11C,47 counties,TRUE,47
+14.11C,unique keys,TRUE,
+14.12C,rows found,TRUE,48 rows
+14.12C,47 counties,TRUE,47
+14.12C,unique keys,TRUE,
+14.12C,distribution sums to 100,TRUE,"48 rows, 2 cols"
+14.13C,rows found,TRUE,48 rows
+14.13C,47 counties,TRUE,47
+14.13C,unique keys,TRUE,
+14.13C,distribution sums to 100,TRUE,"48 rows, 2 cols"
+14.1C,rows found,TRUE,48 rows
+14.1C,47 counties,TRUE,47
+14.1C,unique keys,TRUE,
+14.3C,rows found,TRUE,48 rows
+14.3C,47 counties,TRUE,47
+14.3C,unique keys,TRUE,
+14.4C,rows found,TRUE,48 rows
+14.4C,47 counties,TRUE,47
+14.4C,unique keys,TRUE,
+14.7C,rows found,TRUE,48 rows
+14.7C,47 counties,TRUE,47
+14.7C,unique keys,TRUE,
+2.10.1C,rows found,TRUE,48 rows
+2.10.1C,47 counties,TRUE,47
+2.10.1C,unique keys,TRUE,
+2.10.1C,distribution sums to 100,TRUE,"48 rows, 6 cols"
+2.10.2C,rows found,TRUE,48 rows
+2.10.2C,47 counties,TRUE,47
+2.10.2C,unique keys,TRUE,
+2.10.2C,distribution sums to 100,TRUE,"48 rows, 8 cols"
+2.10.3C,rows found,TRUE,48 rows
+2.10.3C,47 counties,TRUE,47
+2.10.3C,unique keys,TRUE,
+2.10.3C,distribution sums to 100,TRUE,"48 rows, 6 cols"
+2.10.4C,rows found,TRUE,48 rows
+2.10.4C,47 counties,TRUE,47
+2.10.4C,unique keys,TRUE,
+2.10.4C,distribution sums to 100,TRUE,"48 rows, 9 cols"
+2.11C,rows found,TRUE,48 rows
+2.11C,47 counties,TRUE,47
+2.11C,unique keys,TRUE,
+2.12C,rows found,TRUE,48 rows
+2.12C,47 counties,TRUE,47
+2.12C,unique keys,TRUE,
+2.12C,distribution sums to 100,TRUE,"48 rows, 3 cols"
+2.19C,rows found,TRUE,48 rows
+2.19C,47 counties,TRUE,47
+2.19C,unique keys,TRUE,
+2.9C,rows found,TRUE,48 rows
+2.9C,47 counties,TRUE,47
+2.9C,unique keys,TRUE,
+3.10C,rows found,TRUE,48 rows
+3.10C,47 counties,TRUE,47
+3.10C,unique keys,TRUE,
+3.11C,rows found,TRUE,48 rows
+3.11C,47 counties,TRUE,47
+3.11C,unique keys,TRUE,
+3.12C,rows found,TRUE,48 rows
+3.12C,47 counties,TRUE,47
+3.12C,unique keys,TRUE,
+3.12C,distribution sums to 100,TRUE,"45 rows, 10 cols"
+3.13C,rows found,TRUE,48 rows
+3.13C,47 counties,TRUE,47
+3.13C,unique keys,TRUE,
+3.14C,rows found,TRUE,48 rows
+3.14C,47 counties,TRUE,47
+3.14C,unique keys,TRUE,
+3.15C,rows found,TRUE,48 rows
+3.15C,47 counties,TRUE,47
+3.15C,unique keys,TRUE,
+3.1C,rows found,TRUE,48 rows
+3.1C,47 counties,TRUE,47
+3.1C,unique keys,TRUE,
+3.2C,rows found,TRUE,48 rows
+3.2C,47 counties,TRUE,47
+3.2C,unique keys,TRUE,
+3.2C,distribution sums to 100,TRUE,"48 rows, 7 cols"
+3.3C,rows found,TRUE,48 rows
+3.3C,47 counties,TRUE,47
+3.3C,unique keys,TRUE,
+3.3C,distribution sums to 100,TRUE,"48 rows, 6 cols"
+3.4C,rows found,TRUE,48 rows
+3.4C,47 counties,TRUE,47
+3.4C,unique keys,TRUE,
+3.5C,rows found,TRUE,48 rows
+3.5C,47 counties,TRUE,47
+3.5C,unique keys,TRUE,
+3.5C,distribution sums to 100,TRUE,"48 rows, 4 cols"
+3.6C,rows found,TRUE,48 rows
+3.6C,47 counties,TRUE,47
+3.6C,unique keys,TRUE,
+3.6C,distribution sums to 100,TRUE,"48 rows, 3 cols"
+3.8C,rows found,TRUE,47 rows
+3.8C,47 counties,TRUE,46
+3.8C,unique keys,TRUE,
+3.8C,distribution sums to 100,TRUE,"46 rows, 6 cols"
+4.2C,rows found,TRUE,48 rows
+4.2C,47 counties,TRUE,47
+4.2C,unique keys,TRUE,
+4.4C,rows found,TRUE,48 rows
+4.4C,47 counties,TRUE,47
+4.4C,unique keys,TRUE,
+4.5C,rows found,TRUE,48 rows
+4.5C,47 counties,TRUE,47
+4.5C,unique keys,TRUE,
+4.5C,distribution sums to 100,TRUE,"48 rows, 5 cols"
+5.11C,rows found,TRUE,48 rows
+5.11C,47 counties,TRUE,47
+5.11C,unique keys,TRUE,
+5.12C,rows found,TRUE,48 rows
+5.12C,47 counties,TRUE,47
+5.12C,unique keys,TRUE,
+5.14C,rows found,TRUE,48 rows
+5.14C,47 counties,TRUE,47
+5.14C,unique keys,TRUE,
+5.14C,distribution sums to 100,TRUE,"48 rows, 4 cols"
+5.5C,rows found,TRUE,48 rows
+5.5C,47 counties,TRUE,47
+5.5C,unique keys,TRUE,
+5.5C,distribution sums to 100,TRUE,"48 rows, 6 cols"
+6.4C,rows found,TRUE,48 rows
+6.4C,47 counties,TRUE,47
+6.4C,unique keys,TRUE,
+6.6C,rows found,TRUE,48 rows
+6.6C,47 counties,TRUE,47
+6.6C,unique keys,TRUE,
+7.14.1C,rows found,TRUE,48 rows
+7.14.1C,47 counties,TRUE,47
+7.14.1C,unique keys,TRUE,
+7.14.2C,rows found,TRUE,47 rows
+7.14.2C,47 counties,TRUE,46
+7.14.2C,unique keys,TRUE,
+7.16C,rows found,TRUE,48 rows
+7.16C,47 counties,TRUE,47
+7.16C,unique keys,TRUE,
+7.17C,rows found,TRUE,48 rows
+7.17C,47 counties,TRUE,47
+7.17C,unique keys,TRUE,
+7.2C,rows found,TRUE,48 rows
+7.2C,47 counties,TRUE,47
+7.2C,unique keys,TRUE,
+7.7C,rows found,TRUE,48 rows
+7.7C,47 counties,TRUE,47
+7.7C,unique keys,TRUE,
+9.11C,rows found,TRUE,50 rows
+9.11C,47 counties,TRUE,47
+9.11C,unique keys,TRUE,
+9.11C,distribution sums to 100,TRUE,"50 rows, 7 cols"
+9.12C,rows found,TRUE,50 rows
+9.12C,47 counties,TRUE,47
+9.12C,unique keys,TRUE,
+9.12C,distribution sums to 100,TRUE,"50 rows, 5 cols"
+9.13C,rows found,TRUE,50 rows
+9.13C,47 counties,TRUE,47
+9.13C,unique keys,TRUE,
+9.14C,rows found,TRUE,48 rows
+9.14C,47 counties,TRUE,47
+9.14C,unique keys,TRUE,
+9.14C,distribution sums to 100,TRUE,"48 rows, 7 cols"
+9.15C,rows found,TRUE,48 rows
+9.15C,47 counties,TRUE,47
+9.15C,unique keys,TRUE,
+9.15C,distribution sums to 100,TRUE,"48 rows, 4 cols"
+9.16C,rows found,TRUE,48 rows
+9.16C,47 counties,TRUE,47
+9.16C,unique keys,TRUE,
+9.17C,rows found,TRUE,48 rows
+9.17C,47 counties,TRUE,47
+9.17C,unique keys,TRUE,
+9.18C,rows found,TRUE,48 rows
+9.18C,47 counties,TRUE,47
+9.18C,unique keys,TRUE,
+9.19C,rows found,TRUE,48 rows
+9.19C,47 counties,TRUE,47
+9.19C,unique keys,TRUE,
+9.20C,rows found,TRUE,48 rows
+9.20C,47 counties,TRUE,47
+9.20C,unique keys,TRUE,
+9.20C,distribution sums to 100,TRUE,"48 rows, 4 cols"
+9.21.1C,rows found,TRUE,48 rows
+9.21.1C,47 counties,TRUE,47
+9.21.1C,unique keys,TRUE,
+9.21.1C,distribution sums to 100,TRUE,"48 rows, 4 cols"
+9.21.2C,rows found,TRUE,48 rows
+9.21.2C,47 counties,TRUE,47
+9.21.2C,unique keys,TRUE,
+9.21.2C,distribution sums to 100,TRUE,"48 rows, 4 cols"
+9.22C,rows found,TRUE,48 rows
+9.22C,47 counties,TRUE,47
+9.22C,unique keys,TRUE,
+9.22C,distribution sums to 100,TRUE,"46 rows, 5 cols"
+9.2C,rows found,TRUE,50 rows
+9.2C,47 counties,TRUE,47
+9.2C,unique keys,TRUE,
+9.2C,distribution sums to 100,TRUE,"50 rows, 6 cols"
+9.3.1C,rows found,TRUE,50 rows
+9.3.1C,47 counties,TRUE,47
+9.3.1C,unique keys,TRUE,
+9.3.2C,rows found,TRUE,50 rows
+9.3.2C,47 counties,TRUE,47
+9.3.2C,unique keys,TRUE,
+9.4C,rows found,TRUE,50 rows
+9.4C,47 counties,TRUE,47
+9.4C,unique keys,TRUE,
+9.4C,distribution sums to 100,TRUE,"50 rows, 6 cols"
+9.6C,rows found,TRUE,48 rows
+9.6C,47 counties,TRUE,47
+9.6C,unique keys,TRUE,
+9.8C,rows found,TRUE,50 rows
+9.8C,47 counties,TRUE,47
+9.8C,unique keys,TRUE,
+9.9C,rows found,TRUE,49 rows
+9.9C,47 counties,TRUE,47
+9.9C,unique keys,TRUE,
+9.9C,distribution sums to 100,TRUE,"49 rows, 5 cols"
+7.4.2C,total matches 7.4.2,TRUE,19/19 shared indicators agree
