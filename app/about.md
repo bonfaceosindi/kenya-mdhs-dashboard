@@ -15,6 +15,8 @@ those tables into an interactive tool. You can:
 
 - see the national picture at a glance,
 - map any county-level indicator and rank all 47 counties,
+- follow 31 indicators across every Kenya DHS since 1989, and map how counties changed
+  between 2014, 2022 and 2025–26,
 - read a one-page profile of a single county against the national figure,
 - open any extracted table, search it and download it as CSV.
 
@@ -33,10 +35,15 @@ of health information systems.
    all 47 counties, percentage distributions must add up to 100, and county totals
    must match the national tables. A random sample of values was also checked by
    hand against the PDF.
-3. **Dashboard.** The app is written in R Shiny with bslib, leaflet and plotly. It runs
+3. **Trends.** Earlier surveys come from the DHS Program API, which uses the same indicator
+   definitions in every survey. As an independent check, the API's 2025–26 values were compared
+   with the values extracted from the PDF: all 720 overlapping values (47 counties and Kenya,
+   15 indicators) match exactly.
+4. **Dashboard.** The app is written in R Shiny with bslib, leaflet and plotly. It runs
    in the browser through Shinylive, so it can be hosted for free on GitHub Pages.
 
-County boundaries come from geoBoundaries (gbOpen, KEN ADM1, CC BY 4.0).
+County boundaries come from geoBoundaries (gbOpen, KEN ADM1, CC BY 4.0). Trends use
+[The DHS Program API](https://api.dhsprogram.com) (ICF).
 
 ### Reading the numbers
 
@@ -47,6 +54,9 @@ County boundaries come from geoBoundaries (gbOpen, KEN ADM1, CC BY 4.0).
 - County estimates rest on small samples, and the differences between neighbouring
   counties are often within sampling error.
 - A higher rank is not always better. Rank 1 is simply the highest value.
+- Trends compare a full DHS (2014, 2022) with a Mini DHS (2025–26). The indicators shown use the
+  same definitions in each survey, but small changes, especially for single counties, can be
+  within sampling error.
 - A few source issues are documented in the extraction registry. For example, the
   Wajir row is missing from Table 3.8C, and the Mombasa row in Table 7.14.2C is blank
   in the PDF.

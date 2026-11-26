@@ -1,0 +1,32 @@
+indicator_id,label,topic,unit,better,kmdhs_key,source_2025,note
+FE_FRTR_W_TFR,Total fertility rate,Fertility,births per woman,lower,5.2C :: Total fertility rate,api,
+FE_TNPG_W_CBR,Teenagers (15–19) who have begun childbearing,Fertility,percent,lower,,api,
+FP_CUSM_W_ANY,Married women using any contraceptive method,Family planning,percent,higher,7.4.2C :: Any method,api,
+FP_CUSM_W_MOD,Married women using a modern contraceptive method,Family planning,percent,higher,7.4.2C :: Any modern method,api,
+FP_NADM_W_UNT,Unmet need for family planning (married women),Family planning,percent,lower,7.14.1C :: Unmet need for family planning,api,
+FP_NADM_W_PDM,Demand for family planning satisfied by modern methods,Family planning,percent,higher,7.14.1C :: Demand satisfied by modern methods,api,
+RH_ANCP_W_SKP,Antenatal care from a skilled provider,Maternal & newborn health,percent,higher,9.1C :: ANC from a skilled provider,api,
+RH_ANCN_W_N4P,Four or more antenatal care visits,Maternal & newborn health,percent,higher,9.2C :: 4+ ANC visits,api,
+RH_DELP_C_DHF,Births in a health facility,Maternal & newborn health,percent,higher,9.7C :: Delivered in a health facility,api,
+RH_DELA_C_SKP,Births assisted by a skilled provider,Maternal & newborn health,percent,higher,9.9C :: Skilled birth attendance,api,
+CM_ECMR_C_NNR,Neonatal mortality rate,Child health,"per 1,000",lower,,api,National estimate only
+CM_ECMR_C_IMR,Infant mortality rate,Child health,"per 1,000",lower,,api,National estimate only
+CM_ECMR_C_U5M,Under-5 mortality rate,Child health,"per 1,000",lower,,api,National estimate only
+CH_VACC_C_BAS,Children fully vaccinated (basic antigens),Child health,percent,higher,,none,Not measured in the 2025–26 Mini DHS
+CH_VACC_C_NON,Children with no vaccinations,Child health,percent,lower,,none,Not measured in the 2025–26 Mini DHS
+CN_NUTS_C_HA2,Children under 5 who are stunted,Child nutrition & feeding,percent,lower,,none,Not measured in the 2025–26 Mini DHS
+CN_NUTS_C_WH2,Children under 5 who are wasted,Child nutrition & feeding,percent,lower,,none,Not measured in the 2025–26 Mini DHS
+CN_NUTS_C_WA2,Children under 5 who are underweight,Child nutrition & feeding,percent,lower,,none,Not measured in the 2025–26 Mini DHS
+CN_BRFS_C_EXB,Exclusive breastfeeding (infants under 6 months),Child nutrition & feeding,percent,higher,,api,
+ML_NETP_H_ITN,Households with at least one ITN,Malaria,percent,higher,12.1C :: Households with an ITN,api,
+ML_ITNA_P_ACC,Population with access to an ITN,Malaria,percent,higher,12.3C :: Population with access to an ITN,api,
+ML_NETC_C_ITN,Children under 5 who slept under an ITN,Malaria,percent,higher,12.6C :: Children slept under an ITN,api,
+ML_IPTP_W_3SP,Pregnant women with 3+ doses of SP/Fansidar (IPTp),Malaria,percent,higher,12.9C :: IPTp 3+ doses of SP/Fansidar,api,
+WS_SRCE_P_BAS,Population with at least basic drinking water,"Water, sanitation & hygiene",percent,higher,13.2C :: At least basic drinking water service,kmdhs,2025–26 value from the report (not yet in the API)
+WS_TLET_P_BAS,Population with at least basic sanitation,"Water, sanitation & hygiene",percent,higher,13.4C :: At least basic sanitation service,kmdhs,2025–26 value from the report (not yet in the API)
+WS_TLET_P_NFC,Population practising open defecation,"Water, sanitation & hygiene",percent,lower,13.4C :: Open defecation,kmdhs,2025–26 value from the report (not yet in the API)
+CP_BREG_C_REG,Births registered (children under 5),Housing & household population,percent,higher,2.9C :: Birth registered,kmdhs,2025–26 value from the report (not yet in the API)
+ED_LITR_W_LIT,Women who are literate,Respondents & health insurance,percent,higher,3.3C :: Literate,api,
+ED_EDUC_W_SEH,Women with secondary or higher education,Respondents & health insurance,percent,higher,,api,
+CO_INUS_W_U12,Women who used the internet in the past 12 months,Respondents & health insurance,percent,higher,3.5C :: Used internet in past 12 months,api,
+CO_MOBB_W_MOB,Women who own a mobile phone,Respondents & health insurance,percent,higher,,api,

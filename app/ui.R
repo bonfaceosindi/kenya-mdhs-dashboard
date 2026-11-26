@@ -57,6 +57,16 @@ app_css_template <- ("
                font-variant-numeric: tabular-nums; }
   .kpi-note { font-size: .78rem; color: var(--bs-secondary-color); line-height: 1.3; flex: 1; }
   .kpi-link { font-size: .8rem; font-weight: 600; margin-top: .2rem; }
+  /* Change since 2022: the arrow carries the colour, the words stay in text colour */
+  .kpi-change { font-size: .78rem; color: var(--bs-secondary-color); }
+  .kpi-change .bi { font-size: .95rem; }
+  .kpi-change.up .bi { color: #1f7f9e; }
+  .kpi-change.down .bi { color: %5$s; }
+  [data-bs-theme='dark'] .kpi-change.up .bi { color: #5cc3e3; }
+  [data-bs-theme='dark'] .kpi-change.down .bi { color: #f08a7e; }
+  .trend-key { font-size: .78rem; color: var(--bs-secondary-color); font-weight: 400; }
+  .trend-key .sw { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin: 0 .3rem 0 .6rem; }
+  .mini-title { font-size: .85rem; font-weight: 600; line-height: 1.25; min-height: 2.2em; }
   .topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: .75rem; }
   @media (min-width: 1500px) { .topic-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
   .hero::after { content: ''; position: absolute; right: -60px; top: -60px; width: 260px; height: 260px;
@@ -66,7 +76,7 @@ app_css_template <- ("
   .hero p.lead { color: rgba(255,255,255,.86); max-width: 62ch; font-size: 1.05rem; }
   .hero .form-label { color: rgba(255,255,255,.9); font-weight: 600; }
   .hero .selectize-input { border: 0; }
-  .hero-stats { display: grid; grid-template-columns: repeat(4, auto); gap: .5rem 1.75rem; color: rgba(255,255,255,.85); }
+  .hero-stats { display: grid; grid-template-columns: repeat(5, auto); gap: .5rem 1.75rem; color: rgba(255,255,255,.85); }
   @media (max-width: 600px) { .hero-stats { grid-template-columns: repeat(2, auto); } }
   .hero-stats strong { display: block; color: #fff; font-size: 1.5rem; font-family: Archivo, sans-serif; }
 
@@ -158,6 +168,13 @@ overview_box <- function(i) {
     } else {
       div(class = "kpi-note", "Per 1,000 live births, 5 years before the survey. National only.")
     },
+    if (!is.na(k$value_2022)) {
+      d <- k$national - k$value_2022
+      better <- (k$better == "higher" && d > 0) || (k$better == "lower" && d < 0)
+      div(class = paste("kpi-change", if (abs(d) < 0.05) "same" else if (better) "up" else "down"),
+          bs_icon(if (d > 0) "arrow-up-right" else if (d < 0) "arrow-down-right" else "arrow-right"),
+          sprintf(" %s since 2022 (%s)", fmt_change(d, k$unit), fmt_value(k$value_2022, k$unit)))
+    },
     if (k$county_level) actionLink(paste0("go_", i), tagList("Map all counties ", bs_icon("arrow-right")),
                                    class = "kpi-link")
   )
@@ -247,7 +264,8 @@ page_navbar(
                   div(strong("47"), "counties"),
                   div(strong(format(nrow(indicators))), "county indicators"),
                   div(strong(nrow(catalog)), "report tables"),
-                  div(strong(format(nrow(kmdhs), big.mark = ",")), "values checked"))),
+                  div(strong(format(nrow(kmdhs), big.mark = ",")), "values checked"),
+                  div(strong(n_distinct(trends$survey_id)), "surveys since 1989"))),
           div(class = "hero-search",
               selectizeInput("jump_ind", "Find an indicator", choices = c("", ALL_IND_CHOICES), width = "100%",
                              options = list(placeholder = "Type, e.g. 'stunting', 'SHA', 'condom'...")),
@@ -281,6 +299,7 @@ page_navbar(
         hr(class = "my-2"),
         uiOutput("ind_info"),
         actionLink("to_table", tagList(bs_icon("table"), " View the full report table"), class = "small"),
+        uiOutput("to_trend_link"),
         hr(class = "my-2"),
         selectizeInput("county", "Highlight a county",
                        choices = c("None" = "", COUNTY_NAMES),
@@ -305,6 +324,40 @@ page_navbar(
     )
   ),
 
+  # ---- Trends -------------------------------------------------------------------------------------
+  nav_panel(
+    "Trends", icon = bs_icon("graph-up"),
+    layout_sidebar(
+      sidebar = sidebar(
+        width = 330,
+        selectInput("tr_topic", "Topic", choices = TREND_TOPICS, selected = "Family planning"),
+        selectInput("tr_ind", "Indicator", choices = trend_choices("Family planning"),
+                    selected = "FP_CUSM_W_MOD"),
+        uiOutput("tr_info"),
+        selectizeInput("tr_counties", "Compare counties (up to 4)", choices = COUNTY_NAMES,
+                       multiple = TRUE,
+                       options = list(maxItems = 4, placeholder = "Type, or click the map")),
+        p(class = "source-note",
+          "Kenya DHS surveys 1989 to 2025–26, from the DHS Program API, which uses the same definitions ",
+          "in every survey. Counties exist from 2014; earlier surveys give national figures only.")
+      ),
+      card(
+        card_header(uiOutput("tr_title")),
+        plotlyOutput("tr_line", height = "360px")
+      ),
+      uiOutput("tr_county_section"),
+      card(
+        card_header("Values by survey"),
+        DTOutput("tr_table"),
+        card_footer(
+          div(class = "d-flex flex-wrap gap-2 align-items-center justify-content-between",
+              span(class = "source-note", "Kenya first, then counties in KNBS code order."),
+              downloadButton("tr_download", "Download CSV", class = "btn-sm btn-outline-primary")))
+      ),
+      author_footer()
+    )
+  ),
+
   # ---- County profile -----------------------------------------------------------------------
   nav_panel(
     "County profile", icon = bs_icon("geo-alt"),
@@ -326,6 +379,22 @@ page_navbar(
       card(
         card_header("Headline indicators: county compared with Kenya"),
         plotlyOutput("profile_plot", height = "460px")
+      ),
+      card(
+        card_header(tagList("How the county has changed since 2014",
+                            span(class = "trend-key",
+                                 span(class = "sw", style = sprintf("background:%s", COMPARE_COLS[1])), "County",
+                                 span(class = "sw", style = "background:#7a6662"), "Kenya"))),
+        do.call(layout_column_wrap, c(
+          list(width = "240px", gap = ".75rem"),
+          lapply(seq_along(PROFILE_TRENDS), function(i) {
+            m <- TREND_IND[TREND_IND$indicator_id == PROFILE_TRENDS[i], ]
+            div(div(class = "mini-title", m$label),
+                plotlyOutput(paste0("pt_", i), height = "150px"))
+          })
+        )),
+        p(class = "source-note mb-0 mt-2",
+          "Surveys: 2014 and 2022 Kenya DHS, 2025–26 Kenya Mini DHS. Stunting and vaccination were not measured in 2025–26.")
       ),
       card(
         card_header(tagList("All county indicators",

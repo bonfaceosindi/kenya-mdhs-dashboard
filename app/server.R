@@ -8,12 +8,15 @@ function(input, output, session) {
   selected_county <- reactiveVal(NULL)                 # highlighted county (map, ranking)
   pending_ind     <- reactiveVal(NULL)                 # indicator to select after a topic change
   table_sel       <- reactiveVal(catalog$table_id[1])  # table shown in the Tables tab
+  pending_tr      <- reactiveVal(NULL)                 # trend indicator to select after a topic change
 
   ink <- reactive({
     if (identical(input$dark_mode, "dark")) {
-      list(text = "#f1e6e2", muted = "#b7a39d", grid = "#3a2e2c", bar = "#e39a88", hi = "#5cc3e3")
+      list(text = "#f1e6e2", muted = "#b7a39d", grid = "#3a2e2c", bar = "#e39a88", hi = "#5cc3e3",
+           up = "#5cc3e3", down = "#f08a7e", cmp = c("#e39a88", "#5cc3e3", "#e0a64a", "#6cc47a"))
     } else {
-      list(text = "#2b2222", muted = "#7a6662", grid = "#eee4df", bar = ACCENT, hi = HIGHLIGHT)
+      list(text = "#2b2222", muted = "#7a6662", grid = "#eee4df", bar = ACCENT, hi = HIGHLIGHT,
+           up = "#1f7f9e", down = MAROON, cmp = COMPARE_COLS)
     }
   })
 
@@ -34,6 +37,17 @@ function(input, output, session) {
     }
     if (!is.null(county)) set_county(county)
     nav_select("nav", "County explorer")
+  }
+
+  go_trend <- function(id) {
+    tp <- TREND_IND$topic[TREND_IND$indicator_id == id]
+    if (identical(tp, input$tr_topic)) {
+      updateSelectInput(session, "tr_ind", selected = id)
+    } else {
+      pending_tr(id)
+      updateSelectInput(session, "tr_topic", selected = tp)
+    }
+    nav_select("nav", "Trends")
   }
 
   go_profile <- function(cty) {
@@ -63,6 +77,10 @@ function(input, output, session) {
       go_profile(q$county)
     } else if (identical(q$tab, "tables") && isTRUE(q$table %in% catalog$table_id)) {
       open_table(q$table)
+    } else if (identical(q$tab, "trends") && isTRUE(q$ind %in% TREND_IND$indicator_id)) {
+      go_trend(q$ind)
+      cmp <- intersect(strsplit(q$counties %||% "", ",", fixed = TRUE)[[1]], COUNTY_NAMES)
+      if (length(cmp)) updateSelectizeInput(session, "tr_counties", selected = head(cmp, 4))
     } else if (identical(q$tab, "about")) {
       nav_select("nav", "About")
     }
@@ -72,6 +90,8 @@ function(input, output, session) {
     req(input$nav)
     q <- switch(input$nav,
                 "County explorer" = c(tab = "explorer", ind = input$ind, county = selected_county()),
+                "Trends"          = c(tab = "trends", ind = input$tr_ind,
+                                      counties = if (length(input$tr_counties)) paste(input$tr_counties, collapse = ",")),
                 "County profile"  = c(tab = "profile", county = input$profile_county),
                 "Tables"          = c(tab = "tables", table = table_sel()),
                 "About"           = c(tab = "about"),
@@ -124,6 +144,15 @@ function(input, output, session) {
   observeEvent(input$ind_next, step_indicator(1L))
 
   observeEvent(input$to_table, open_table(meta()$table_id))
+
+  # Link to the multi-year series when this indicator has one
+  trend_for <- reactive(TREND_IND$indicator_id[match(meta()$key, TREND_IND$kmdhs_key)])
+  output$to_trend_link <- renderUI({
+    if (is.na(trend_for())) return(NULL)
+    div(actionLink("to_trend", tagList(bs_icon("graph-up"), " See how this has changed over time"),
+                   class = "small"))
+  })
+  observeEvent(input$to_trend, go_trend(trend_for()))
   observeEvent(input$to_profile, go_profile(selected_county() %||% input$profile_county))
 
   # ---- Current indicator ---------------------------------------------------------------------
@@ -200,10 +229,15 @@ function(input, output, session) {
   }
 
   output$map <- renderLeaflet({
+    base_map() |>
+      draw_counties(isolate(by_cty()), isolate(meta())) |>
+      draw_highlight(isolate(selected_county()))
+  })
+
+  # Blank Kenya map shared by the explorer and the Trends tab
+  base_map <- function() {
     leaflet(options = leafletOptions(attributionControl = FALSE, zoomSnap = 0.25)) |>
       fitBounds(33.9, -4.7, 41.9, 5.0) |>
-      draw_counties(isolate(by_cty()), isolate(meta())) |>
-      draw_highlight(isolate(selected_county())) |>
       # The map is often created inside a hidden tab; fit Kenya once it has a real size
       htmlwidgets::onRender("
         function(el, x) {
@@ -217,7 +251,7 @@ function(input, output, session) {
           new ResizeObserver(function() { clearTimeout(timer); timer = setTimeout(fit, 120); }).observe(el);
           setTimeout(fit, 300);
         }")
-  })
+  }
 
   # Recolour with a proxy instead of re-rendering the whole map
   observeEvent(meta(), {
@@ -272,11 +306,14 @@ function(input, output, session) {
       config(displayModeBar = FALSE)
     event_register(p, "plotly_click")
   }) |>
-    bindCache(input$ind, selected_county() %||% "", input$dark_mode)
+    bindCache("rank_plot", input$ind, selected_county() %||% "", input$dark_mode)
 
-  observeEvent(event_data("plotly_click", source = "rank"), {
-    set_county(event_data("plotly_click", source = "rank")$customdata[[1]])
+  # Listen only on the explorer tab: plotly warns if this runs before the chart is first drawn
+  rank_click <- reactive({
+    req(identical(input$nav, "County explorer"))
+    suppressWarnings(event_data("plotly_click", source = "rank"))
   })
+  observeEvent(rank_click(), set_county(rank_click()$customdata[[1]]))
 
   # ---- County profile ----------------------------------------------------------------------------
   step_county <- function(by) {
@@ -351,7 +388,7 @@ function(input, output, session) {
       ) |>
       config(displayModeBar = FALSE)
   }) |>
-    bindCache(input$profile_county, input$dark_mode)
+    bindCache("profile_plot", input$profile_county, input$dark_mode)
 
   profile_table_data <- reactive({
     d <- profile_rows()
@@ -381,6 +418,317 @@ function(input, output, session) {
     if (identical(input$tables_topic, "All topics")) catalog else catalog[catalog$topic == input$tables_topic, ]
   })
 
+  # ---- Trends --------------------------------------------------------------------------------------------
+  observeEvent(input$tr_topic, {
+    ch  <- trend_choices(input$tr_topic)
+    sel <- pending_tr()
+    if (is.null(sel) || !sel %in% ch) sel <- ch[[1]]
+    updateSelectInput(session, "tr_ind", choices = ch, selected = sel)
+    pending_tr(NULL)
+  }, ignoreInit = TRUE)
+
+  tr_meta   <- reactive({ req(input$tr_ind %in% TREND_IND$indicator_id)
+                          TREND_IND[TREND_IND$indicator_id == input$tr_ind, ] })
+  tr_data   <- reactive(trends |> filter(indicator_id == tr_meta()$indicator_id))
+  tr_nat    <- reactive(tr_data() |> filter(level == "national") |> arrange(year))
+  tr_cty    <- reactive(tr_data() |> filter(level == "county"))
+  tr_cyears <- reactive(YEAR_ORDER$year_label[YEAR_ORDER$year_label %in% tr_cty()$year_label])
+
+  # Map view ("y:<year>" or "c:<from>|<to>"), checked against this indicator's county years
+  # (the radio input can still hold the previous indicator's choice for a moment)
+  tr_view <- reactive({
+    v <- input$tr_view %||% ""; yrs <- tr_cyears()
+    yrs_in <- strsplit(sub("^[yc]:", "", v), "|", fixed = TRUE)[[1]]
+    if (grepl("^[yc]:", v) && length(yrs_in) && all(yrs_in %in% yrs)) v
+    else if (length(yrs)) paste0("y:", yrs[length(yrs)]) else ""
+  })
+
+  # The two surveys being compared: from the map selector, else first and last county years
+  tr_pair <- reactive({
+    v <- tr_view()
+    yrs <- tr_cyears()
+    if (startsWith(v, "c:")) strsplit(sub("^c:", "", v), "|", fixed = TRUE)[[1]]
+    else if (length(yrs) >= 2) c(yrs[1], yrs[length(yrs)])
+    else NULL
+  })
+
+  output$tr_title <- renderUI({
+    m <- tr_meta(); n <- tr_nat()
+    div(div(class = "crumbs", m$topic, span(class = "sep", "›"),
+            sprintf("Kenya, %s to %s", n$year_label[1], n$year_label[nrow(n)])),
+        div(m$label))
+  })
+
+  output$tr_info <- renderUI({
+    m <- tr_meta(); n <- tr_nat()
+    first <- n[1, ]; last <- n[nrow(n), ]
+    d <- last$value - first$value
+    tagList(
+      div(class = "ind-national",
+          span(class = "small text-body-secondary", paste0("Kenya, ", last$year_label)),
+          strong(fmt_value(last$value, m$unit))),
+      if (nrow(n) > 1) p(class = "small mb-1",
+                         sprintf("%s from %s in %s (%s).", if (d >= 0) "Up" else "Down",
+                                 fmt_value(first$value, m$unit), first$year_label, fmt_change(d, m$unit))),
+      p(class = "universe mb-1",
+        if (m$better == "higher") "Higher is better." else "Lower is better.",
+        if (!is.na(m$note)) paste0(" ", m$note, "."))
+    )
+  })
+
+  output$tr_line <- renderPlotly({
+    m <- tr_meta(); k <- ink(); n <- tr_nat()
+    sel <- input$tr_counties
+    cd  <- tr_cty() |> filter(area %in% sel)
+    yrs <- YEAR_ORDER |> filter(year_label %in% tr_data()$year_label)
+    p <- plot_ly() |>
+      add_trace(data = n, x = ~year, y = ~value, type = "scatter", mode = "lines+markers", name = "Kenya",
+                line = list(color = k$text, width = 3), marker = list(color = k$text, size = 9),
+                text = ~paste0("<b>Kenya, ", year_label, "</b><br>", fmt_value(value, m$unit)),
+                hoverinfo = "text")
+    ends <- n |> slice_tail(n = 1) |> mutate(lab = "Kenya")
+    for (i in seq_along(sel)) {
+      d <- cd |> filter(area == sel[i]) |> arrange(year)
+      if (!nrow(d)) next
+      p <- p |> add_trace(data = d, x = ~year, y = ~value, type = "scatter", mode = "lines+markers",
+                          name = sel[i], line = list(color = k$cmp[i], width = 2.5),
+                          marker = list(color = k$cmp[i], size = 8),
+                          text = ~paste0("<b>", area, ", ", year_label, "</b><br>", fmt_value(value, m$unit)),
+                          hoverinfo = "text")
+      ends <- bind_rows(ends, d |> slice_tail(n = 1) |> mutate(lab = sel[i]))
+    }
+    notes <- lapply(seq_len(nrow(ends)), function(j)
+      list(x = ends$year[j], y = ends$value[j], text = paste0("  ", ends$lab[j]), xanchor = "left",
+           showarrow = FALSE, font = list(color = k$text, size = 12)))
+    p |>
+      layout(
+        xaxis = list(title = "", tickmode = "array", tickvals = yrs$year, ticktext = yrs$year_label,
+                     range = c(min(yrs$year) - 1, max(yrs$year) + 4), color = k$muted,
+                     gridcolor = k$grid, zeroline = FALSE, fixedrange = TRUE),
+        yaxis = list(title = list(text = unit_label(m$unit), font = list(size = 12)), rangemode = "tozero",
+                     color = k$muted, gridcolor = k$grid, zeroline = FALSE, fixedrange = TRUE),
+        legend = list(orientation = "h", x = 0, y = 1.12, font = list(color = k$text)),
+        annotations = notes,
+        paper_bgcolor = "rgba(0,0,0,0)", plot_bgcolor = "rgba(0,0,0,0)",
+        margin = list(l = 50, r = 10, t = 30, b = 30), font = list(family = FONT_STACK),
+        hoverlabel = list(font = list(family = FONT_STACK))
+      ) |>
+      config(displayModeBar = FALSE)
+  }) |>
+    bindCache("tr_line", input$tr_ind, paste(input$tr_counties, collapse = "|"), input$dark_mode)
+
+  output$tr_county_section <- renderUI({
+    yrs <- tr_cyears()
+    if (!length(yrs)) {
+      return(card(card_body(p(class = "mb-0 text-body-secondary", bs_icon("info-circle"),
+        " The surveys report this indicator for Kenya as a whole only, so there is no county map."))))
+    }
+    views <- setNames(paste0("y:", yrs), yrs)
+    if (length(yrs) >= 2) {
+      pairs <- list(c(yrs[1], yrs[length(yrs)]))
+      if (length(yrs) == 3) pairs <- c(pairs, list(yrs[2:3]))
+      views <- c(views, setNames(vapply(pairs, function(p) paste0("c:", p[1], "|", p[2]), ""),
+                                 vapply(pairs, function(p) paste0("Change ", p[1], " → ", p[2]), "")))
+    }
+    layout_columns(
+      col_widths = c(6, 6),
+      card(
+        full_screen = TRUE,
+        card_header(div(class = "d-flex flex-wrap gap-2 align-items-center justify-content-between",
+                        span("County map"),
+                        radioButtons("tr_view", NULL, choices = views, inline = TRUE,
+                                     selected = paste0("y:", yrs[length(yrs)])))),
+        card_body(padding = 0, leafletOutput("tr_map", height = "540px")),
+        card_footer(span(class = "source-note",
+                         "Click a county to add it to the comparison. Change shades are relative to the largest change on the map."))
+      ),
+      if (length(yrs) >= 2) {
+        card(
+          full_screen = TRUE,
+          card_header(uiOutput("tr_change_title")),
+          card_body(plotlyOutput("tr_change", height = "560px")),
+          card_footer(span(class = "source-note",
+                           "Hollow dot: earlier survey. Filled dot: later survey, blue if better, maroon if worse. ",
+                           "Best improvement at the top."))
+        )
+      } else {
+        card(card_body(p(class = "text-body-secondary mb-0", bs_icon("info-circle"),
+          sprintf(" County values exist for %s only, so change by county cannot be shown. The national trend is above.", yrs))))
+      }
+    )
+  })
+
+  draw_compare <- function(map, sel) {
+    for (i in 1:4) map <- removeShape(map, paste0("cmp_", i))
+    for (i in seq_along(sel)) {
+      j <- match(sel[i], COUNTY_NAMES)
+      map <- addPolygons(map, lng = counties$lng[[j]], lat = counties$lat[[j]], layerId = paste0("cmp_", i),
+                         fill = FALSE, color = ink()$cmp[i], weight = 4, opacity = 1,
+                         options = pathOptions(interactive = FALSE, noClip = TRUE))
+    }
+    map
+  }
+
+  output$tr_map <- renderLeaflet({
+    v <- tr_view()
+    req(nzchar(v))
+    m <- tr_meta(); d <- tr_cty()
+    if (startsWith(v, "y:")) {
+      yr  <- sub("^y:", "", v)
+      dd  <- d[d$year_label == yr, ]
+      val <- dd$value[match(COUNTY_NAMES, dd$area)]
+      pal <- colorNumeric(SEQ_RAMP, domain = range(val, na.rm = TRUE), na.color = NA_FILL)
+      fill <- pal(val)
+      lab <- sprintf("<strong>%s, %s</strong><br>%s", COUNTY_NAMES, yr, fmt_value(val, m$unit))
+      add_legend <- function(map) addLegend(map, "bottomleft", pal = pal, values = val, opacity = 0.95,
+                                            title = paste(unit_label(m$unit), yr),
+                                            labFormat = labelFormat(suffix = if (m$unit == "percent") "%" else ""))
+    } else {
+      pr <- strsplit(sub("^c:", "", v), "|", fixed = TRUE)[[1]]
+      a  <- d[d$year_label == pr[1], ]; b <- d[d$year_label == pr[2], ]
+      va <- a$value[match(COUNTY_NAMES, a$area)]; vb <- b$value[match(COUNTY_NAMES, b$area)]
+      ch <- vb - va
+      imp <- if (m$better == "higher") ch else -ch
+      t <- suppressWarnings(max(abs(imp), na.rm = TRUE)); if (!is.finite(t) || t == 0) t <- 1
+      cols <- c(MAROON, "#d39a8f", "#e6e1de", "#8fcbe0", "#1f7f9e")   # worse ... better, grey midpoint
+      bin  <- cut(imp, c(-Inf, -t / 2, -t / 6, t / 6, t / 2, Inf), labels = FALSE)
+      fill <- ifelse(is.na(bin), NA_FILL, cols[bin])
+      lab <- sprintf("<strong>%s</strong><br>%s: %s<br>%s: %s<br>Change: %s", COUNTY_NAMES,
+                     pr[1], fmt_value(va, m$unit), pr[2], fmt_value(vb, m$unit),
+                     ifelse(is.na(ch), "–", fmt_change(ch, m$unit)))
+      add_legend <- function(map) addLegend(map, "bottomleft", colors = rev(cols), opacity = 0.95,
+                                            labels = c("Much better", "Better", "About the same", "Worse", "Much worse"),
+                                            title = paste0("Change, ", pr[1], " to ", pr[2]))
+    }
+    map <- base_map()
+    for (i in seq_along(COUNTY_NAMES)) {
+      map <- addPolygons(map, lng = counties$lng[[i]], lat = counties$lat[[i]], layerId = COUNTY_NAMES[i],
+                         fillColor = fill[i], fillOpacity = 0.95, color = "#ffffff", weight = 1, opacity = 1,
+                         label = HTML(lab[i]), options = pathOptions(noClip = TRUE),
+                         highlightOptions = highlightOptions(weight = 2.5, color = "#2b2222", bringToFront = TRUE))
+    }
+    map |> add_legend() |> draw_compare(isolate(input$tr_counties))
+  })
+
+  observeEvent(input$tr_counties, {
+    leafletProxy("tr_map") |> draw_compare(input$tr_counties)
+  }, ignoreNULL = FALSE, ignoreInit = TRUE)
+
+  observeEvent(input$tr_map_shape_click, {
+    id  <- input$tr_map_shape_click$id
+    req(id %in% COUNTY_NAMES)
+    cur <- input$tr_counties
+    new <- if (id %in% cur) setdiff(cur, id) else tail(c(cur, id), 4)
+    updateSelectizeInput(session, "tr_counties", selected = new)
+  })
+
+  output$tr_change_title <- renderUI({
+    pr <- tr_pair(); req(length(pr) == 2)
+    m <- tr_meta(); n <- tr_nat()
+    a <- n$value[n$year_label == pr[1]]; b <- n$value[n$year_label == pr[2]]
+    div(if (length(a) && length(b))
+          div(class = "crumbs", sprintf("Kenya: %s → %s (%s)", fmt_value(a, m$unit), fmt_value(b, m$unit),
+                                        fmt_change(b - a, m$unit))),
+        div(sprintf("Change by county, %s to %s", pr[1], pr[2])))
+  })
+
+  output$tr_change <- renderPlotly({
+    pr <- tr_pair(); req(length(pr) == 2)
+    m <- tr_meta(); k <- ink(); sel <- input$tr_counties
+    d <- tr_cty() |> filter(year_label %in% pr) |> select(area, year_label, value) |>
+      pivot_wider(names_from = year_label, values_from = value)
+    d <- tibble(area = d$area, a = d[[pr[1]]], b = d[[pr[2]]]) |>
+      filter(!is.na(a), !is.na(b)) |>
+      mutate(ch = b - a, imp = if (m$better == "higher") ch else -ch) |>
+      arrange(imp)
+    col   <- ifelse(d$imp > 0, k$up, ifelse(d$imp < 0, k$down, k$muted))
+    ticks <- ifelse(d$area %in% sel, paste0("<b>", d$area, "</b>"), d$area)
+    hover <- sprintf("<b>%s</b><br>%s: %s<br>%s: %s<br>Change: %s", d$area, pr[1], fmt_value(d$a, m$unit),
+                     pr[2], fmt_value(d$b, m$unit), fmt_change(d$ch, m$unit))
+    plot_ly(d) |>
+      add_segments(x = ~a, xend = ~b, y = ~area, yend = ~area, line = list(color = k$grid, width = 3),
+                   hoverinfo = "none", showlegend = FALSE) |>
+      add_markers(x = ~a, y = ~area, text = hover, hoverinfo = "text", showlegend = FALSE,
+                  marker = list(color = "rgba(0,0,0,0)", size = 8, line = list(color = k$muted, width = 1.5))) |>
+      add_markers(x = ~b, y = ~area, text = hover, hoverinfo = "text", showlegend = FALSE,
+                  marker = list(color = col, size = 9)) |>
+      layout(
+        xaxis = list(title = list(text = unit_label(m$unit), font = list(size = 12)), color = k$muted,
+                     gridcolor = k$grid, zeroline = FALSE, fixedrange = TRUE),
+        yaxis = list(title = "", type = "category", categoryorder = "array", categoryarray = d$area,
+                     tickmode = "array", tickvals = d$area, ticktext = ticks, color = k$text,
+                     tickfont = list(size = 10), fixedrange = TRUE),
+        paper_bgcolor = "rgba(0,0,0,0)", plot_bgcolor = "rgba(0,0,0,0)",
+        margin = list(l = 110, r = 16, t = 10, b = 40), font = list(family = FONT_STACK),
+        hoverlabel = list(font = list(family = FONT_STACK))
+      ) |>
+      config(displayModeBar = FALSE)
+  }) |>
+    bindCache("tr_change", input$tr_ind, paste(tr_pair(), collapse = "|"), paste(input$tr_counties, collapse = "|"),
+              input$dark_mode)
+
+  output$tr_table <- renderDT({
+    m <- tr_meta()
+    w <- tr_data() |>
+      filter(level %in% c("national", "county")) |>
+      mutate(v = fmt_value(value, m$unit)) |>
+      select(area, year_label, v) |>
+      pivot_wider(names_from = year_label, values_from = v)
+    w <- w[order(match(w$area, c("Kenya", COUNTY_NAMES))),
+           c("area", intersect(YEAR_ORDER$year_label, names(w)))]
+    names(w)[1] <- "Area"
+    datatable(w, rownames = FALSE, selection = "none",
+              options = list(pageLength = 12, dom = "ftip", scrollX = TRUE,
+                             columnDefs = list(list(className = "dt-right", targets = seq_len(ncol(w) - 1)))))
+  })
+
+  output$tr_download <- downloadHandler(
+    filename = function() paste0("kenya_dhs_trend_", tr_meta()$indicator_id, ".csv"),
+    content  = function(file) {
+      write.csv(tr_data() |> select(indicator_id, label, unit, survey_id, year_label, level, area,
+                                    value, n_unweighted, source),
+                file, row.names = FALSE, na = "")
+    }
+  )
+
+  # County profile: how the county has changed (small multiples)
+  lapply(seq_along(PROFILE_TRENDS), function(i) {
+    output[[paste0("pt_", i)]] <- renderPlotly({
+      req(input$profile_county %in% COUNTY_NAMES)
+      id <- PROFILE_TRENDS[i]; k <- ink()
+      m  <- TREND_IND[TREND_IND$indicator_id == id, ]
+      d  <- trends |> filter(indicator_id == id, year >= 2014,
+                             level == "national" | (level == "county" & area == input$profile_county))
+      kn <- d |> filter(level == "national") |> arrange(year)
+      cd <- d |> filter(level == "county") |> arrange(year)
+      yrs <- YEAR_ORDER |> filter(year >= 2014)
+      plot_ly() |>
+        add_trace(data = kn, x = ~year, y = ~value, type = "scatter", mode = "lines+markers",
+                  line = list(color = k$muted, width = 2), marker = list(color = k$muted, size = 6),
+                  text = ~paste0("Kenya, ", year_label, ": ", fmt_value(value, m$unit)), hoverinfo = "text") |>
+        add_trace(data = cd, x = ~year, y = ~value, type = "scatter", mode = "lines+markers",
+                  line = list(color = k$bar, width = 2.5), marker = list(color = k$bar, size = 7),
+                  text = ~paste0(area, ", ", year_label, ": ", fmt_value(value, m$unit)), hoverinfo = "text") |>
+        layout(
+          showlegend = FALSE,
+          xaxis = list(title = "", tickmode = "array", tickvals = yrs$year, ticktext = yrs$year_label,
+                       range = c(2012.5, 2027),
+                       color = k$muted, gridcolor = k$grid, zeroline = FALSE, fixedrange = TRUE,
+                       tickfont = list(size = 10)),
+          yaxis = list(title = "", rangemode = "tozero", color = k$muted, gridcolor = k$grid, zeroline = FALSE,
+                       fixedrange = TRUE, tickfont = list(size = 10),
+                       ticksuffix = if (m$unit == "percent") "%" else ""),
+          margin = list(l = 40, r = 8, t = 6, b = 24),
+          paper_bgcolor = "rgba(0,0,0,0)", plot_bgcolor = "rgba(0,0,0,0)", font = list(family = FONT_STACK)
+        ) |>
+        config(displayModeBar = FALSE)
+    }) |>
+      # The indicator must be in the key: these 8 outputs share code, so they share cache entries
+      bindCache("profile_trend", PROFILE_TRENDS[i], input$profile_county, input$dark_mode)
+  })
+
+
+  # ---- Tables: catalog and table view (catalog_view is defined above) ----------------------------
   output$catalog_table <- renderDT({
     v <- catalog_view()
     sel <- match(isolate(table_sel()), v$table_id)

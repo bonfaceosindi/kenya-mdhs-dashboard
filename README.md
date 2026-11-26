@@ -42,9 +42,10 @@ engineering, interactive visualisation and deployment, end to end.
 
 | Tab | What it gives you |
 |---|---|
-| **Overview** | Twelve headline indicators (fertility, contraception, antenatal care, facility births, SHA coverage, ITN access, water, internet use and more), each with the national figure and the county range. Quick search across all 532 county indicators, and topic cards to browse. |
+| **Overview** | Twelve headline indicators (fertility, contraception, antenatal care, facility births, SHA coverage, ITN access, water, internet use and more), each with the national figure, the county range and the change since the 2022 survey. Quick search across all 532 county indicators, and topic cards to browse. |
 | **County explorer** | Pick any of the 532 county-level indicators: a choropleth map of Kenya and a ranked bar chart of all 47 counties, with the national value marked. Click a county to highlight it. Step through indicators with Previous / Next. |
-| **County profile** | A one-page profile for any county: headline tiles with rank, a county-versus-Kenya comparison chart, and a searchable table of every indicator. Select a row to map that indicator. |
+| **Trends** | 31 indicators across every Kenya DHS since 1989: Kenya's line over time with up to four counties overlaid, a county map you can filter by survey year (2014, 2022, 2025–26) or switch to show change between years, a chart ranking counties by how much they improved, and a downloadable table. |
+| **County profile** | A one-page profile for any county: headline tiles with rank, a county-versus-Kenya comparison chart, small charts of how the county has changed since 2014, and a searchable table of every indicator. Select a row to map that indicator. |
 | **Tables** | Every extracted report table, searchable, filterable by topic and downloadable as CSV, laid out like the report. |
 | **About** | Motivation, method, how to read the numbers, and the source and licence. |
 
@@ -56,14 +57,17 @@ and the Kenyan flag.
 |---|---|
 | ![County explorer](screenshots/county-explorer.png) | ![County profile](screenshots/county-profile.png) |
 
+![Trends: births in a health facility, 1993 to 2025–26, with three counties compared](screenshots/trends.png)
+
 ---
 
 ## How it was made
 
 ```
-Report PDF ──► extract/extract_tables.R ──► app/data/*.rds ──► app/ (Shiny) ──► Docker or GitHub Pages
-                 │                            ▲
-                 └─ extract/table_registry.csv (hand-checked column names, one row per table)
+Report PDF ──► extract/extract_tables.R ──► app/data/kmdhs.rds ─┐
+                 └─ extract/table_registry.csv                     ├─► app/ (Shiny) ──► Docker or GitHub Pages
+DHS Program API ──► extract/fetch_trends.R ──► app/data/trends.rds ─┘
+                 └─ extract/trend_indicators.csv  (cross-checked against kmdhs.rds)
 ```
 
 ### 1. Extraction (`extract/extract_tables.R`)
@@ -96,7 +100,26 @@ The build **stops without writing any data** if a check fails. The checks are:
 The latest build passes all 319 automated checks (`extract/qa_report.csv`). A further 35 randomly
 sampled values were checked by hand against the PDF and all match (`extract/qa_log.csv`).
 
-### 3. The data
+### 3. Trends across surveys (`extract/fetch_trends.R`)
+
+Earlier surveys come from the **DHS Program API**, which publishes every Kenya DHS (1989, 1993, 1998,
+2003, 2008–09, 2014, 2022 and 2025–26) with the same indicator definitions in each one. This
+avoids parsing older reports, whose tables are laid out differently.
+
+- `extract/trend_indicators.csv` is a curated list of 31 indicators with labels, topics, units,
+  whether higher is better, and the matching 2025–26 report indicator.
+- Counties exist from 2014. Earlier surveys report national (and former province) figures only.
+  Mortality rates are kept national only, because their county versions use a 10-year period.
+- Where the API does not yet have a 2025–26 value (water, sanitation, birth registration), it is
+  taken from the report extraction.
+- **Independent cross-check:** where both sources have 2025–26 values, the API's figures were compared
+  with the PDF extraction. All **720 values** across 15 indicators (47 counties plus Kenya) match
+  exactly (`extract/trend_crosscheck.csv`). The build stops if any disagree.
+
+Definitions that changed between surveys are not forced into a trend. For example, SHA coverage has
+no earlier equivalent, and stunting and vaccination were not measured in the 2025–26 Mini DHS.
+
+### 4. The data
 
 | | |
 |---|---|
@@ -104,13 +127,14 @@ sampled values were checked by hand against the PDF and all match (`extract/qa_l
 | Values | 26,089 |
 | County-level indicators | 532 |
 | Topics | 12 |
+| Trend indicators | 31, across 8 surveys from 1989 to 2025–26 (4,655 values) |
 
 The tidy dataset (`app/data/kmdhs.rds`) has one row per value: table, topic, title, page, panel,
 group, category, indicator, value, flag, denominator (n) and unit. County boundaries come from
 **geoBoundaries** (gbOpen, KEN ADM1, CC BY 4.0) and are stored as plain coordinates, so the app does
 not need `sf` at runtime.
 
-### 4. The app (`app/`)
+### 5. The app (`app/`)
 
 - **R Shiny** with **bslib** (Bootstrap 5), **leaflet** for the map, **plotly** for the charts and **DT**
   for the tables.
@@ -135,13 +159,17 @@ not need `sf` at runtime.
 │   ├── about.md                # the About tab
 │   └── data/                   # prebuilt by the extraction script
 │       ├── kmdhs.rds           # tidy values (26,089 rows)
+│       ├── trends.rds          # 1989–2025–26 series (4,655 rows)
 │       ├── catalog.csv         # one row per report table
 │       └── counties.rds        # county boundaries
 ├── extract/
 │   ├── extract_tables.R        # PDF -> tidy data, with validation
 │   ├── table_registry.csv      # hand-checked column names for each table
 │   ├── qa_report.csv           # automated validation results
-│   └── qa_log.csv              # manual spot checks against the PDF
+│   ├── qa_log.csv              # manual spot checks against the PDF
+│   ├── fetch_trends.R          # DHS Program API -> trends, with cross-check
+│   ├── trend_indicators.csv    # the 31 trend indicators and their report matches
+│   └── trend_crosscheck.csv    # API vs report, 2025–26 (720 values, all match)
 ├── screenshots/                # images used in this README
 ├── .github/workflows/deploy.yml  # builds and publishes the GitHub Pages site
 └── Dockerfile                  # runs the app in a container
@@ -188,6 +216,13 @@ Rscript extract/extract_tables.R --draft-county     # draft every county table n
 Extraction needs `pdftools`, `dplyr`, `tidyr`, `stringr`, `purrr` and `readr`. To rebuild the
 county boundaries once, it also needs `sf` and `jsonlite`.
 
+To refresh the multi-year trends (needs internet access and `jsonlite`; run after the extraction,
+because it cross-checks against `app/data/kmdhs.rds`):
+
+```bash
+Rscript extract/fetch_trends.R
+```
+
 ### Deployment
 
 Every push to `main` triggers `.github/workflows/deploy.yml`. The workflow exports `app/` with
@@ -221,6 +256,9 @@ November 2026.
 The report is published under **CC BY-NC 4.0**. This dashboard is a non-commercial derivative. It is
 not an official product of KNBS, the Ministry of Health or ICF, and its values come from the
 published tables, not the survey microdata.
+
+Trends across surveys: The DHS Program API (ICF), Kenya DHS 1989 to 2025–26,
+[api.dhsprogram.com](https://api.dhsprogram.com).
 
 County boundaries: geoBoundaries, gbOpen KEN ADM1, CC BY 4.0.
 

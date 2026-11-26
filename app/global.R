@@ -112,6 +112,7 @@ ALL_IND_CHOICES <- split(
 
 # ---- Formatting helpers --------------------------------------------------------
 fmt_value <- function(x, unit) {
+  unit <- rep_len(unit, length(x))   # one unit for many values must not shorten the result
   out <- ifelse(unit == "per 1,000", formatC(x, format = "f", digits = 0),
                 formatC(x, format = "f", digits = 1))
   out <- ifelse(unit == "percent", paste0(out, "%"), out)
@@ -169,6 +170,56 @@ key_indicators <- key_indicators |>
     by = "key")
 
 stopifnot(!anyNA(key_indicators$national))
+
+# ---- Trends: Kenya DHS 1989 to 2025–26 (from extract/fetch_trends.R) ----------------------
+trends <- readRDS("data/trends.rds")
+
+TREND_IND <- trends |>
+  distinct(indicator_id, label, topic, unit, better, note, kmdhs_key) |>
+  mutate(county_years = vapply(indicator_id, function(id)
+    length(unique(trends$year_label[trends$indicator_id == id & trends$level == "county"])), 1L))
+TREND_TOPICS <- unique(TREND_IND$topic)
+YEAR_ORDER   <- trends |> distinct(year, year_label) |> arrange(year)
+
+trend_choices <- function(tp) {
+  d <- TREND_IND[TREND_IND$topic == tp, ]
+  setNames(d$indicator_id, d$label)
+}
+
+# Change wording: percentage points for percentages, plain units otherwise
+fmt_change <- function(d, unit) {
+  u <- switch(unit, "percent" = " points", "births per woman" = " births per woman",
+              "per 1,000" = " per 1,000", "")
+  dig <- if (unit == "per 1,000") 0 else 1
+  paste0(ifelse(d > 0, "+", ifelse(d < 0, "−", "±")), formatC(abs(d), format = "f", digits = dig), u)
+}
+
+# Categorical colours for compared counties (fixed order; Kenya is always the ink colour)
+COMPARE_COLS <- c("#8c3530", "#2F9BBF", "#c47f17", "#2E8B3A")
+
+# Headline indicator -> matching trend series (same definition in every survey)
+KEY_TREND <- c(
+  "5.2C :: Total fertility rate"                   = "FE_FRTR_W_TFR",
+  "8.2 :: Under-5 mortality"                       = "CM_ECMR_C_U5M",
+  "7.4.2C :: Any modern method"                    = "FP_CUSM_W_MOD",
+  "7.14.1C :: Demand satisfied by modern methods"  = "FP_NADM_W_PDM",
+  "9.2C :: 4+ ANC visits"                          = "RH_ANCN_W_N4P",
+  "9.7C :: Delivered in a health facility"         = "RH_DELP_C_DHF",
+  "2.9C :: Birth registered"                       = "CP_BREG_C_REG",
+  "12.3C :: Population with access to an ITN"      = "ML_ITNA_P_ACC",
+  "13.2C :: At least basic drinking water service" = "WS_SRCE_P_BAS",
+  "3.5C :: Used internet in past 12 months"        = "CO_INUS_W_U12"
+)
+nat_2022 <- trends |> filter(level == "national", survey_id == "KE2022DHS") |>
+  select(indicator_id, value_2022 = value)
+key_indicators <- key_indicators |>
+  mutate(trend_id = unname(KEY_TREND[key])) |>
+  left_join(nat_2022, by = c("trend_id" = "indicator_id")) |>
+  left_join(select(TREND_IND, indicator_id, better), by = c("trend_id" = "indicator_id"))
+
+# Small multiples on the County profile: series with county values in at least two surveys
+PROFILE_TRENDS <- c("FP_CUSM_W_MOD", "RH_DELP_C_DHF", "RH_ANCN_W_N4P", "FE_FRTR_W_TFR",
+                    "FE_TNPG_W_CBR", "ML_NETC_C_ITN", "CN_NUTS_C_HA2", "CH_VACC_C_BAS")
 
 # Overview sections
 SECTIONS <- c("Fertility and family planning", "Mothers and children", "Living conditions and health cover")
